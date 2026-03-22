@@ -102,22 +102,15 @@ class XtreamDataSourceImpl implements XtreamDataSource {
   @override
   Future<List<MovieCategoryModel>> getMovieCategories() async {
     try {
-      print('XtreamDataSource: Fetching movie categories...');
       final response = await _dioClient.get<dynamic>(
         ApiConstants.defaultApiPath,
         queryParameters: {'action': ApiConstants.getMoviesAction},
       );
 
-      print('XtreamDataSource: Response = ${response.data}');
-      
-      if (response.data == null) {
-        print('XtreamDataSource: Response data is null');
-        return [];
-      }
+      if (response.data == null) return [];
 
       // Handle both Map<String, dynamic> and List responses
       if (response.data is List) {
-        print('XtreamDataSource: Response is a list, treating as categories');
         return (response.data as List)
             .map((c) => MovieCategoryModel.fromJson(c as Map<String, dynamic>))
             .toList();
@@ -125,16 +118,12 @@ class XtreamDataSourceImpl implements XtreamDataSource {
 
       final data = response.data as Map<String, dynamic>;
       final categories = data[ApiConstants.categoriesKey];
-      if (categories == null) {
-        print('XtreamDataSource: No categories key in response');
-        return [];
-      }
+      if (categories == null) return [];
 
       return (categories as List)
           .map((c) => MovieCategoryModel.fromJson(c as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print('XtreamDataSource: Error fetching categories - $e');
       return [];
     }
   }
@@ -142,7 +131,6 @@ class XtreamDataSourceImpl implements XtreamDataSource {
   @override
   Future<List<MovieModel>> getMovies(String categoryId) async {
     try {
-      print('XtreamDataSource: Fetching movies for category $categoryId');
       final response = await _dioClient.get<dynamic>(
         ApiConstants.defaultApiPath,
         queryParameters: {
@@ -151,8 +139,6 @@ class XtreamDataSourceImpl implements XtreamDataSource {
         },
       );
 
-      print('XtreamDataSource: Movies response = ${response.data}');
-      
       if (response.data == null) return [];
 
       // Xtream returns movies directly in response.data (not under 'movies' key)
@@ -179,7 +165,6 @@ class XtreamDataSourceImpl implements XtreamDataSource {
               ))
           .toList();
     } catch (e) {
-      print('XtreamDataSource: Error fetching movies - $e');
       return [];
     }
   }

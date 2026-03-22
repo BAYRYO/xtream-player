@@ -74,7 +74,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(state.copyWith(status: AuthStatus.loading));
-    print('AuthBloc: Login requested for ${event.username}');
 
     try {
       final user = await _authRepository.login(
@@ -82,7 +81,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.username,
         event.password,
       );
-      print('AuthBloc: Login successful, user = ${user.username}');
       emit(state.copyWith(
         status: AuthStatus.authenticated,
         user: user,
@@ -90,7 +88,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         savedUsername: event.username,
       ));
     } catch (e) {
-      print('AuthBloc: Login failed - $e');
       String errorMessage = e.toString();
       
       // Clean up error messages

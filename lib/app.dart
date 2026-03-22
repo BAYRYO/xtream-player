@@ -30,7 +30,6 @@ class StreamXtreamApp extends StatelessWidget {
         theme: AppTheme.darkTheme,
         home: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
-            print('StreamXtreamApp: status = ${state.status}');
             if (state.status == AuthStatus.initial ||
                 state.status == AuthStatus.loading) {
               return const Scaffold(

@@ -61,7 +61,6 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          print('LoginPage listener: status = ${state.status}');
           if (state.status == AuthStatus.authenticated) {
             // Navigate to main page after successful login
             Navigator.of(context).pushReplacement(
