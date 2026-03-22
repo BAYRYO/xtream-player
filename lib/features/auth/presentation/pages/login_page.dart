@@ -4,6 +4,7 @@ import 'package:stream_xtream/core/theme/app_theme.dart';
 import 'package:stream_xtream/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:stream_xtream/features/auth/presentation/bloc/auth_event.dart';
 import 'package:stream_xtream/features/auth/presentation/bloc/auth_state.dart';
+import 'package:stream_xtream/features/home/presentation/pages/main_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -64,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
           if (state.status == AuthStatus.authenticated) {
             // Navigate to main page after successful login
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const MainPage()),
+              MaterialPageRoute(builder: (_) => MainPage()),
             );
           } else if (state.status == AuthStatus.error && state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(

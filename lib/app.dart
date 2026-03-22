@@ -48,10 +48,10 @@ class StreamXtreamApp extends StatelessWidget {
             }
             
             if (state.status == AuthStatus.authenticated) {
-              return const MainPage();
+              return MainPage();
             }
             
-            return const LoginPage();
+            return LoginPage();
           },
         ),
       ),
