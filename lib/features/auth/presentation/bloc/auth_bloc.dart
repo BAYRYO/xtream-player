@@ -21,27 +21,45 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(state.copyWith(status: AuthStatus.loading));
 
     try {
-      final isLoggedIn = await _authRepository.isLoggedIn();
-      final savedCredentials = await _authRepository.getSavedCredentials();
-
-      if (isLoggedIn && savedCredentials != null) {
-        final user = await _authRepository.getCurrentUser();
-        if (user != null) {
-          emit(state.copyWith(
-            status: AuthStatus.authenticated,
-            user: user,
-            savedServerUrl: savedCredentials['serverUrl'],
-            savedUsername: savedCredentials['username'],
-          ));
-        } else {
-          emit(state.copyWith(
-            status: AuthStatus.unauthenticated,
-            savedServerUrl: savedCredentials['serverUrl'],
-            savedUsername: savedCredentials['username'],
-          ));
-        }
-      } else {
+      // Add timeout to prevent infinite loading
+      final isLoggedIn = await _authRepository.isLoggedIn().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => false,
+      );
+      
+      if (!isLoggedIn) {
         emit(state.copyWith(status: AuthStatus.unauthenticated));
+        return;
+      }
+      
+      final savedCredentials = await _authRepository.getSavedCredentials().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => null,
+      );
+
+      if (savedCredentials == null) {
+        emit(state.copyWith(status: AuthStatus.unauthenticated));
+        return;
+      }
+
+      final user = await _authRepository.getCurrentUser().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => null,
+      );
+      
+      if (user != null) {
+        emit(state.copyWith(
+          status: AuthStatus.authenticated,
+          user: user,
+          savedServerUrl: savedCredentials['serverUrl'],
+          savedUsername: savedCredentials['username'],
+        ));
+      } else {
+        emit(state.copyWith(
+          status: AuthStatus.unauthenticated,
+          savedServerUrl: savedCredentials['serverUrl'],
+          savedUsername: savedCredentials['username'],
+        ));
       }
     } catch (e) {
       emit(state.copyWith(
