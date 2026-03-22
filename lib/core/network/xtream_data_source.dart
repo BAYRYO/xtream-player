@@ -47,13 +47,9 @@ class XtreamDataSourceImpl implements XtreamDataSource {
     _updateCredentials(serverUrl, username, password);
     
     try {
+      // For authentication, don't pass action parameter - Xtream expects just username/password
       final response = await _dioClient.get<Map<String, dynamic>>(
         ApiConstants.defaultApiPath,
-        queryParameters: {
-          'username': username,
-          'password': password,
-          'action': ApiConstants.authEndpoint,
-        },
       );
 
       if (response.data == null) {
