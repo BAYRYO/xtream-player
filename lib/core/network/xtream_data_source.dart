@@ -62,7 +62,19 @@ class XtreamDataSourceImpl implements XtreamDataSource {
 
       final userData = response.data!;
       
-      // Check for auth errors
+      // Check for auth errors - Xtream returns user_info
+      if (userData.containsKey('user_info')) {
+        final userInfo = userData['user_info'];
+        if (userInfo is Map<String, dynamic>) {
+          return UserModel.fromJson({
+            ...userInfo,
+            'username': username,
+            'password': password,
+          });
+        }
+      }
+      
+      // Check legacy format
       if (userData.containsKey('user')) {
         final user = userData['user'];
         if (user is Map<String, dynamic>) {
