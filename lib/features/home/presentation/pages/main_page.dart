@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_xtream/core/theme/app_theme.dart';
+import 'package:stream_xtream/features/movies/domain/entities/movie.dart';
 import 'package:stream_xtream/features/movies/presentation/pages/movies_page.dart';
 import 'package:stream_xtream/features/series/presentation/pages/series_page.dart';
 import 'package:stream_xtream/features/settings/presentation/pages/settings_page.dart';
@@ -8,6 +9,7 @@ import 'package:stream_xtream/features/profile/presentation/pages/profiles_page.
 import 'package:stream_xtream/features/home/presentation/bloc/home_bloc.dart';
 import 'package:stream_xtream/features/home/presentation/bloc/home_event.dart';
 import 'package:stream_xtream/features/home/presentation/bloc/home_state.dart';
+import 'package:stream_xtream/features/player/presentation/pages/video_player_page.dart';
 import 'package:stream_xtream/injection_container.dart' as di;
 
 class MainPage extends StatefulWidget {

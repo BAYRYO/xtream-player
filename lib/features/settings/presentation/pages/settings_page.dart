@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_xtream/core/theme/app_theme.dart';
 import 'package:stream_xtream/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:stream_xtream/features/auth/presentation/bloc/auth_event.dart';
+import 'package:stream_xtream/features/profile/presentation/pages/profiles_page.dart';
 import 'xtream_config_page.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -46,7 +47,12 @@ class _SettingsPageState extends State<SettingsPage> {
             title: 'Profile',
             subtitle: 'Manage profiles',
             onTap: () {
-              // Navigate to profiles
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ProfilesPage(),
+                ),
+              );
             },
           ),
           _SettingsTile(
