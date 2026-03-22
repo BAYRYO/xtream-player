@@ -126,15 +126,26 @@ class XtreamDataSourceImpl implements XtreamDataSource {
       final response = await _dioClient.get<Map<String, dynamic>>(
         ApiConstants.defaultApiPath,
         queryParameters: {
-          'action': ApiConstants.getMoviesAction,
+          'action': ApiConstants.getMoviesListAction,
           'category_id': categoryId,
         },
       );
 
       if (response.data == null) return [];
 
-      final movies = response.data![ApiConstants.moviesKey];
-      if (movies == null) return [];
+      // Xtream returns movies directly in response.data (not under 'movies' key)
+      final movies = response.data;
+      if (movies is! List) {
+        // Try 'movies' key as fallback
+        final moviesKey = response.data![ApiConstants.moviesKey];
+        if (moviesKey == null) return [];
+        return (moviesKey as List)
+            .map((m) => MovieModel.fromJson(
+                  m as Map<String, dynamic>,
+                  serverUrl: _baseServerUrl,
+                ))
+            .toList();
+      }
 
       return (movies as List)
           .map((m) => MovieModel.fromJson(

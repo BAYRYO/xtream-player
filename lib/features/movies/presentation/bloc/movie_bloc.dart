@@ -24,11 +24,13 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
 
     try {
       final categories = await _movieRepository.getCategories();
+      print('MovieBloc: Got ${categories.length} categories');
       emit(state.copyWith(
         status: MovieStatus.loaded,
         categories: categories,
       ));
     } catch (e) {
+      print('MovieBloc: Error loading categories - $e');
       emit(state.copyWith(
         status: MovieStatus.error,
         errorMessage: e.toString(),
