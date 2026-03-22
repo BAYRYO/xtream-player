@@ -97,6 +97,9 @@ Future<void> initializeDependencies() async {
   );
   
   sl.registerFactory<HomeBloc>(
-    () => HomeBloc(),
+    () => HomeBloc(
+      movieRepository: sl(),
+      seriesRepository: sl(),
+    ),
   );
 }
