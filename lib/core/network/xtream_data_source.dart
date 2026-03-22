@@ -102,20 +102,39 @@ class XtreamDataSourceImpl implements XtreamDataSource {
   @override
   Future<List<MovieCategoryModel>> getMovieCategories() async {
     try {
-      final response = await _dioClient.get<Map<String, dynamic>>(
+      print('XtreamDataSource: Fetching movie categories...');
+      final response = await _dioClient.get<dynamic>(
         ApiConstants.defaultApiPath,
         queryParameters: {'action': ApiConstants.getMoviesAction},
       );
 
-      if (response.data == null) return [];
+      print('XtreamDataSource: Response = ${response.data}');
+      
+      if (response.data == null) {
+        print('XtreamDataSource: Response data is null');
+        return [];
+      }
 
-      final categories = response.data![ApiConstants.categoriesKey];
-      if (categories == null) return [];
+      // Handle both Map<String, dynamic> and List responses
+      if (response.data is List) {
+        print('XtreamDataSource: Response is a list, treating as categories');
+        return (response.data as List)
+            .map((c) => MovieCategoryModel.fromJson(c as Map<String, dynamic>))
+            .toList();
+      }
+
+      final data = response.data as Map<String, dynamic>;
+      final categories = data[ApiConstants.categoriesKey];
+      if (categories == null) {
+        print('XtreamDataSource: No categories key in response');
+        return [];
+      }
 
       return (categories as List)
           .map((c) => MovieCategoryModel.fromJson(c as Map<String, dynamic>))
           .toList();
     } catch (e) {
+      print('XtreamDataSource: Error fetching categories - $e');
       return [];
     }
   }
@@ -123,7 +142,8 @@ class XtreamDataSourceImpl implements XtreamDataSource {
   @override
   Future<List<MovieModel>> getMovies(String categoryId) async {
     try {
-      final response = await _dioClient.get<Map<String, dynamic>>(
+      print('XtreamDataSource: Fetching movies for category $categoryId');
+      final response = await _dioClient.get<dynamic>(
         ApiConstants.defaultApiPath,
         queryParameters: {
           'action': ApiConstants.getMoviesListAction,
@@ -131,20 +151,25 @@ class XtreamDataSourceImpl implements XtreamDataSource {
         },
       );
 
+      print('XtreamDataSource: Movies response = ${response.data}');
+      
       if (response.data == null) return [];
 
       // Xtream returns movies directly in response.data (not under 'movies' key)
       final movies = response.data;
       if (movies is! List) {
         // Try 'movies' key as fallback
-        final moviesKey = response.data![ApiConstants.moviesKey];
-        if (moviesKey == null) return [];
-        return (moviesKey as List)
-            .map((m) => MovieModel.fromJson(
-                  m as Map<String, dynamic>,
-                  serverUrl: _baseServerUrl,
-                ))
-            .toList();
+        if (movies is Map) {
+          final moviesKey = (movies as Map)[ApiConstants.moviesKey];
+          if (moviesKey == null) return [];
+          return (moviesKey as List)
+              .map((m) => MovieModel.fromJson(
+                    m as Map<String, dynamic>,
+                    serverUrl: _baseServerUrl,
+                  ))
+              .toList();
+        }
+        return [];
       }
 
       return (movies as List)
@@ -154,6 +179,7 @@ class XtreamDataSourceImpl implements XtreamDataSource {
               ))
           .toList();
     } catch (e) {
+      print('XtreamDataSource: Error fetching movies - $e');
       return [];
     }
   }
