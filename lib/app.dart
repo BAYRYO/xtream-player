@@ -28,54 +28,32 @@ class StreamXtreamApp extends StatelessWidget {
         title: 'StreamXtream',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
-        initialRoute: '/',
-        onGenerateRoute: (settings) {
-          switch (settings.name) {
-            case '/':
-              return MaterialPageRoute(
-                builder: (_) => BlocBuilder<AuthBloc, AuthState>(
-                  builder: (context, state) {
-                    if (state.status == AuthStatus.initial ||
-                        state.status == AuthStatus.loading) {
-                      return const Scaffold(
-                        body: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircularProgressIndicator(),
-                              SizedBox(height: 16),
-                              Text('Loading...'),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                    
-                    if (state.status == AuthStatus.authenticated) {
-                      return const MainPage();
-                    }
-                    
-                    return const LoginPage();
-                  },
+        home: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            print('StreamXtreamApp: status = ${state.status}');
+            if (state.status == AuthStatus.initial ||
+                state.status == AuthStatus.loading) {
+              return const Scaffold(
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text('Loading...'),
+                    ],
+                  ),
                 ),
               );
-            case '/main':
-              return MaterialPageRoute(
-                builder: (_) => const MainPage(),
-              );
-            default:
-              return MaterialPageRoute(
-                builder: (_) => BlocBuilder<AuthBloc, AuthState>(
-                  builder: (context, state) {
-                    if (state.status == AuthStatus.authenticated) {
-                      return const MainPage();
-                    }
-                    return const LoginPage();
-                  },
-                ),
-              );
-          }
-        },
+            }
+            
+            if (state.status == AuthStatus.authenticated) {
+              return const MainPage();
+            }
+            
+            return const LoginPage();
+          },
+        ),
       ),
     );
   }

@@ -59,11 +59,13 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
-        listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
+          print('LoginPage listener: status = ${state.status}');
           if (state.status == AuthStatus.authenticated) {
             // Navigate to main page after successful login
-            Navigator.of(context).pushReplacementNamed('/main');
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const MainPage()),
+            );
           } else if (state.status == AuthStatus.error && state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
