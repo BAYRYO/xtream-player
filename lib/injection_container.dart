@@ -17,6 +17,7 @@ import 'features/series/data/repositories/series_repository_impl.dart';
 import 'features/series/domain/repositories/series_repository.dart';
 import 'features/series/presentation/bloc/series_bloc.dart';
 import 'features/player/presentation/bloc/player_bloc.dart';
+import 'features/home/presentation/bloc/home_bloc.dart';
 import 'features/profile/data/models/profile_model.dart';
 
 final sl = GetIt.instance;
@@ -93,5 +94,9 @@ Future<void> initializeDependencies() async {
   
   sl.registerFactory<PlayerBloc>(
     () => PlayerBloc(),
+  );
+  
+  sl.registerFactory<HomeBloc>(
+    () => HomeBloc(),
   );
 }
