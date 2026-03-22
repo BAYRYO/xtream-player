@@ -10,6 +10,8 @@ import 'package:stream_xtream/features/home/presentation/bloc/home_bloc.dart';
 import 'package:stream_xtream/features/home/presentation/bloc/home_event.dart';
 import 'package:stream_xtream/features/home/presentation/bloc/home_state.dart';
 import 'package:stream_xtream/features/player/presentation/pages/video_player_page.dart';
+import 'package:stream_xtream/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:stream_xtream/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:stream_xtream/injection_container.dart' as di;
 
 class MainPage extends StatefulWidget {
@@ -107,7 +109,10 @@ class HomePageContent extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const ProfilesPage(),
+                  builder: (context) => BlocProvider.value(
+                    value: BlocProvider.of<ProfileBloc>(context),
+                    child: const ProfilesPage(),
+                  ),
                 ),
               );
             },

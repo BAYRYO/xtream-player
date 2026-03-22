@@ -37,7 +37,10 @@ class _SettingsPageState extends State<SettingsPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const XtreamConfigPage(),
+                  builder: (context) => BlocProvider.value(
+                    value: BlocProvider.of<AuthBloc>(context),
+                    child: const XtreamConfigPage(),
+                  ),
                 ),
               );
             },
