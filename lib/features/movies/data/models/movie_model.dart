@@ -23,23 +23,32 @@ class MovieModel extends Movie {
   });
 
   factory MovieModel.fromJson(Map<String, dynamic> json, {String? serverUrl}) {
-    // Xtream API format
+    // Xtream API format - fields are: num (id), name, cover, plot, etc.
+    final coverUrl = json['cover'] ?? json['stream_icon'] ?? json['image_url'];
+    String? finalImageUrl;
+    
+    if (coverUrl != null && coverUrl is String) {
+      // If it's already a full URL, use it directly
+      if (coverUrl.startsWith('http')) {
+        finalImageUrl = coverUrl;
+      } else if (serverUrl != null) {
+        // Otherwise prepend server URL
+        finalImageUrl = '$serverUrl$coverUrl';
+      }
+    }
+    
     return MovieModel(
-      id: int.tryParse(json['id']?.toString() ?? '0') ?? 0,
-      title: json['title'] ?? json['name'] ?? '',
-      titleTranslated: json['titleTranslated'] ?? json['title'],
+      id: int.tryParse(json['num']?.toString() ?? json['id']?.toString() ?? '0') ?? 0,
+      title: json['name'] ?? json['title'] ?? '',
+      titleTranslated: json['titleTranslated'] ?? json['name'],
       year: json['year']?.toString(),
       rating: json['rating']?.toString(),
       duration: json['duration']?.toString(),
       plot: json['plot'] ?? json['description'],
       plotTranslated: json['plot'],
       genre: json['genre'] ?? json['category'],
-      imageUrl: json['image_url'] != null 
-          ? '$serverUrl${json['image_url']}' 
-          : json['cover'],
-      backdropUrl: json['backdrop_path'] != null 
-          ? '$serverUrl${json['backdrop_path']}' 
-          : json['backdrop'],
+      imageUrl: finalImageUrl,
+      backdropUrl: json['backdrop_path'] ?? json['backdrop'],
       streamUrl: json['stream_url'] ?? json['src_url'],
       categoryId: json['category_id']?.toString(),
       categoryName: json['category'] ?? json['category_name'],
