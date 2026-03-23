@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../injection_container.dart' as di;
 import '../../domain/entities/movie.dart';
+import '../../domain/repositories/movie_repository.dart';
+import '../../../player/presentation/pages/video_player_page.dart';
 import '../bloc/movie_bloc.dart';
 import '../bloc/movie_event.dart';
 import '../bloc/movie_state.dart';
@@ -253,7 +255,7 @@ class _MovieGrid extends StatelessWidget {
       itemCount: movies.length,
       itemBuilder: (context, index) {
         final movie = movies[index];
-        return _MovieCard(movie: movie);
+        return _MovieCard(movie: movie, parentContext: context);
       },
     );
   }
@@ -261,8 +263,9 @@ class _MovieGrid extends StatelessWidget {
 
 class _MovieCard extends StatelessWidget {
   final dynamic movie;
+  final BuildContext parentContext;
 
-  const _MovieCard({required this.movie});
+  const _MovieCard({required this.movie, required this.parentContext});
 
   @override
   Widget build(BuildContext context) {
@@ -297,7 +300,32 @@ class _MovieCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // Navigate to movie details
+        // Navigate to video player
+        final streamId = movie is Movie 
+            ? movie.id 
+            : (movie['stream_id'] ?? movie['num'] ?? movie['id'] ?? 0);
+        
+        // Get stream URL from repository (requires auth)
+        String streamUrl = '';
+        try {
+          final movieRepo = di.sl<MovieRepository>();
+          streamUrl = movieRepo.getMovieStreamUrl(streamId.toString());
+        } catch (e) {
+          // Fallback URL format
+          streamUrl = 'http://localhost:8000/movie/$streamId.mkv';
+        }
+        
+        Navigator.push(
+          parentContext,
+          MaterialPageRoute(
+            builder: (_) => VideoPlayerPage(
+              streamUrl: streamUrl,
+              title: title,
+              contentId: streamId,
+              contentType: ContentType.movie,
+            ),
+          ),
+        );
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -116,7 +116,8 @@ class DioClient {
       cleanBaseUrl = cleanBaseUrl.substring(0, cleanBaseUrl.length - 1);
     }
     
-    return '$cleanBaseUrl/$type/$id/$authKey/';
+    // Xtream format: http://host:port/type/username/password/id
+    return '$cleanBaseUrl/$type/$_username/$_password/$id';
   }
 
   String getMovieStreamUrl(String movieId) {
