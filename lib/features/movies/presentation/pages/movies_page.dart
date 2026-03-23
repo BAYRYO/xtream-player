@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../injection_container.dart' as di;
+import '../../domain/entities/movie.dart';
 import '../bloc/movie_bloc.dart';
 import '../bloc/movie_event.dart';
 import '../bloc/movie_state.dart';
@@ -265,6 +266,35 @@ class _MovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get image URL safely
+    String? imageUrl;
+    if (movie is Movie) {
+      imageUrl = movie.imageUrl;
+    } else if (movie is Map) {
+      imageUrl = movie['stream_icon'] ?? movie['cover'] ?? movie['image_url'];
+    }
+    
+    // Get title safely
+    String title = '';
+    if (movie is Movie) {
+      title = movie.title;
+    } else if (movie is Map) {
+      title = movie['name'] ?? movie['title'] ?? '';
+    }
+    
+    // Get rating for quality badges
+    String? rating;
+    if (movie is Movie) {
+      rating = movie.rating;
+    } else if (movie is Map) {
+      rating = movie['rating']?.toString();
+    }
+    
+    final titleLower = title.toLowerCase();
+    final is4K = titleLower.contains('4k') || titleLower.contains('uhd');
+    final isHdr = titleLower.contains('hdr') || titleLower.contains('hdr10') || titleLower.contains('hdr10+');
+    final isDolbyVision = titleLower.contains('dolby vision') || titleLower.contains('dolbyvision');
+
     return GestureDetector(
       onTap: () {
         // Navigate to movie details
@@ -279,9 +309,9 @@ class _MovieCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   // Poster
-                  movie.imageUrl != null
+                  imageUrl != null && imageUrl.isNotEmpty
                       ? Image.network(
-                          movie.imageUrl!,
+                          imageUrl,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => _PlaceholderPoster(),
                         )
@@ -292,11 +322,11 @@ class _MovieCard extends StatelessWidget {
                     left: 8,
                     child: Row(
                       children: [
-                        if (movie.is4K)
+                        if (is4K)
                           _QualityBadge(label: '4K', color: AppTheme.uhdColor),
-                        if (movie.isDolbyVision)
+                        if (isDolbyVision)
                           _QualityBadge(label: 'DV', color: AppTheme.dolbyVisionColor),
-                        if (movie.isHdr && !movie.isDolbyVision)
+                        if (isHdr && !isDolbyVision)
                           _QualityBadge(label: 'HDR', color: AppTheme.hdr10Color),
                       ],
                     ),
@@ -307,7 +337,7 @@ class _MovieCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            movie.title,
+            title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodyMedium,
