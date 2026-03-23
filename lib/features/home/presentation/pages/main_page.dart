@@ -149,44 +149,56 @@ class HomePageContent extends StatelessWidget {
             onRefresh: () async {
               context.read<HomeBloc>().add(HomeLoadRequested());
             },
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Featured Movie
-                  if (state.featuredMovie != null)
-                    _FeaturedMovieSection(movie: state.featuredMovie!),
-                  
-                  // Continue Watching
-                  if (state.continueWatching.isNotEmpty)
-                    _ContentRow(
-                      title: 'Continue Watching',
-                      items: state.continueWatching,
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (notification) {
+                if (notification is ScrollEndNotification) {
+                  final metrics = notification.metrics;
+                  if (metrics.pixels >= metrics.maxScrollExtent - 200) {
+                    // Load more when near bottom
+                    context.read<HomeBloc>().add(HomeLoadMoreRequested());
+                  }
+                }
+                return false;
+              },
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Featured Movie
+                    if (state.featuredMovie != null)
+                      _FeaturedMovieSection(movie: state.featuredMovie!),
+                    
+                    // Recent Movies
+                    if (state.recentMovies.isNotEmpty)
+                      _ContentRow(
+                        title: 'Recent Movies',
+                        items: state.recentMovies,
+                      ),
+                    
+                    // Popular Series
+                    if (state.popularSeries.isNotEmpty)
+                      _ContentRow(
+                        title: 'Popular Series',
+                        items: state.popularSeries,
+                      ),
+                    
+                    // All Movies by Category - load on demand
+                    ...state.moviesByCategory.entries.map(
+                      (entry) => _ContentRow(
+                        title: entry.key,
+                        items: entry.value,
+                      ),
                     ),
-                  
-                  // Recent Movies
-                  if (state.recentMovies.isNotEmpty)
-                    _ContentRow(
-                      title: 'Recent Movies',
-                      items: state.recentMovies,
-                    ),
-                  
-                  // Popular Series
-                  if (state.popularSeries.isNotEmpty)
-                    _ContentRow(
-                      title: 'Popular Series',
-                      items: state.popularSeries,
-                    ),
-                  
-                  // All Movies by Category
-                  ...state.moviesByCategory.entries.map(
-                    (entry) => _ContentRow(
-                      title: entry.key,
-                      items: entry.value,
-                    ),
-                  ),
-                ],
+                    
+                    // Loading indicator at bottom
+                    if (state.moviesByCategory.isNotEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                  ],
+                ),
               ),
             ),
           );

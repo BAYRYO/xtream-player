@@ -192,14 +192,22 @@ class XtreamDataSourceImpl implements XtreamDataSource {
   @override
   Future<List<SeriesCategoryModel>> getSeriesCategories() async {
     try {
-      final response = await _dioClient.get<Map<String, dynamic>>(
+      final response = await _dioClient.get<dynamic>(
         ApiConstants.defaultApiPath,
-        queryParameters: {'action': ApiConstants.getSeriesAction},
+        queryParameters: {'action': ApiConstants.getSeriesCategoriesAction},
       );
 
       if (response.data == null) return [];
 
-      final categories = response.data![ApiConstants.categoriesKey];
+      // Handle both Map and List responses
+      if (response.data is List) {
+        return (response.data as List)
+            .map((c) => SeriesCategoryModel.fromJson(c as Map<String, dynamic>))
+            .toList();
+      }
+
+      final data = response.data as Map<String, dynamic>;
+      final categories = data[ApiConstants.categoriesKey];
       if (categories == null) return [];
 
       return (categories as List)
@@ -213,7 +221,7 @@ class XtreamDataSourceImpl implements XtreamDataSource {
   @override
   Future<List<SeriesModel>> getSeries(String categoryId) async {
     try {
-      final response = await _dioClient.get<Map<String, dynamic>>(
+      final response = await _dioClient.get<dynamic>(
         ApiConstants.defaultApiPath,
         queryParameters: {
           'action': ApiConstants.getSeriesAction,
@@ -223,7 +231,18 @@ class XtreamDataSourceImpl implements XtreamDataSource {
 
       if (response.data == null) return [];
 
-      final series = response.data![ApiConstants.seriesKey];
+      // Handle both direct list and nested response
+      if (response.data is List) {
+        return (response.data as List)
+            .map((s) => SeriesModel.fromJson(
+                  s as Map<String, dynamic>,
+                  serverUrl: _baseServerUrl,
+                ))
+            .toList();
+      }
+
+      final data = response.data as Map<String, dynamic>;
+      final series = data[ApiConstants.seriesKey];
       if (series == null) return [];
 
       return (series as List)
