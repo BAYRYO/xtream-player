@@ -10,8 +10,9 @@ class ApiConstants {
   
   // Content endpoints
   static const String getSeriesAction = 'get_series';
+  static const String getSeriesCategoriesAction = 'get_series_categories';
   static const String getMoviesAction = 'get_vod_categories';
-  static const String getMoviesListAction = 'get_vod';
+  static const String getMoviesListAction = 'get_vod_streams';
   static const String getLiveCategoriesAction = 'get_live_categories';
   static const String getLiveStreamsAction = 'get_live_streams';
   static const String getMovieInfoAction = 'get_vod_info';
